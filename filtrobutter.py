@@ -29,9 +29,6 @@ butter_sos = butter(ordem, wn, analog=True, output='sos')
 for sos in butter_sos:
   print("Bloco SOS: ", sos)
 
-from scipy.signal import butter, sosfilt, sos2tf, bilinear, zpk2tf
-import numpy as np
-
 # Frequência de amostragem normalizada
 sampling_freq = 44100
 
@@ -139,8 +136,10 @@ plt.show()
 
 #bz,az = freqz(filtz.num,filtz.den)
 
-hp = lti(*lp2bp(filtz.num,filtz.den))
-bzh,azh = freqz(hp.num,hp.den)
+hp = lti(*lp2hp(butter_numerador, butter_denominador))
+filtz = dlti(*bilinear(hp.num, hp.den, fs=sampling_freq))
+
+bzh,azh = freqz(filtz.num,filtz.den)
 
 plt.plot(bzh*fs/(2*np.pi), 20*np.log10(np.abs(azh)))
 plt.axvline(x=fc, color='orange', ls='--', label='$f_c$ = {} Hz'.format(round(fc)), alpha=0.7)
